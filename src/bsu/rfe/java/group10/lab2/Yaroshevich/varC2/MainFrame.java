@@ -1,33 +1,61 @@
 package bsu.rfe.java.group10.lab2.Yaroshevich.varC2;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class MainFrame extends JFrame {
-
+    //размер окна
     private static final int WIDTH = 400;
     private static final int HEIGHT = 320;
 
+    //текстовые поля
     private JTextField textFieldX;
     private JTextField textFieldY;
     private JTextField textFieldZ;
+    private JTextField textFieldResult;
 
-    private  JTextField textFieldResult;
+    //Внутреняя память
+    private Double mem1;
+    private Double mem2;
+    private Double mem3;
 
     //группа радио кнопок для отображения уникальности выделения в группе
-    private ButtonGroup radioButtons = new ButtonGroup();
+    private ButtonGroup radioButtonsForFunc = new ButtonGroup();
 
-    //Контейнер для отображения радио-кнопок
+    //Контейнер для отображения радио-кнопок:
+    // формул
     private Box hboxFormulaType = Box.createHorizontalBox();
+    // памяти
+    private Box hboxMemoryType = Box.createHorizontalBox();
 
     private int formuaId = 1;
+    private String pathToImageFunc ="C:\\study\\Java\\lab2 - Simple Interface\\images\\func1.jpg";
+    JLabel labelForFormula = new JLabel();
 
     //Формула №1 для расчёта
     public Double calculate1(Double x,Double y,Double z){
         return Math.pow((2*Math.log(1+x)+Math.cos(Math.PI*Math.pow(z,3))),Math.sin(y))+Math.pow(Math.pow(Math.E,Math.pow(x,2))+Math.cos(Math.pow(Math.E,z))+Math.pow(1/y,1/2),1/x);
     }
+
+    // Считывания картинки и вставка её в label
+    private void labelPicture(){
+        if(formuaId==2) pathToImageFunc="C:\\study\\Java\\lab2 - Simple Interface\\images\\func2.jpg";
+        else pathToImageFunc ="C:\\study\\Java\\lab2 - Simple Interface\\images\\func1.jpg";
+        BufferedImage imageFunc1 = null;
+        try {
+            imageFunc1 = ImageIO.read(new File(pathToImageFunc));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        labelForFormula.setIcon(new ImageIcon(imageFunc1));
+    }
+
     //Формлуа №2 для рассчёта
     public Double calculate2(Double x,Double y,Double z){
         return Math.pow(Math.cos(Math.PI*Math.pow(x,3))+2*Math.log(1+y),1/4)*(Math.pow(Math.E,Math.pow(z,2))+Math.pow(1/x,1/2)+Math.cos(Math.pow(Math.E,y)));
@@ -35,20 +63,20 @@ public class MainFrame extends JFrame {
 
     //методы помощники для добавления радио кнопок
     private void addRadioButton(String buttonName,final int formuaId){
-        //Создать экземпляр радио-кнопки с заданным текстом
         JRadioButton button = new JRadioButton(buttonName);
         //Определить и зарегистрировать обработчик
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ev) {
                 MainFrame.this.formuaId = formuaId;
+                labelPicture();
             }
         });
-        radioButtons.add(button);
+        radioButtonsForFunc.add(button);
         hboxFormulaType.add(button);
     }
 
-    public MainFrame() {
+    public MainFrame(){
         //Вызов контруктора JFrame (Создание окна с заголовком)
         super("Вычисления формулы");
 
@@ -57,11 +85,18 @@ public class MainFrame extends JFrame {
         Toolkit kit = Toolkit.getDefaultToolkit();
         setLocation((kit.getScreenSize().width - WIDTH)/2,(kit.getScreenSize().height - HEIGHT)/2);
 
+        //добавление картинки в контейнер
+        Box hboxImageType = Box.createHorizontalBox();
+        hboxImageType.add(Box.createHorizontalGlue());
+        labelPicture();
+        hboxImageType.add(labelForFormula);
+        hboxImageType.add(Box.createHorizontalGlue());
+
         //добавление радио-кнопок выбора формулы и добавление их в контейнер
         hboxFormulaType.add(Box.createHorizontalGlue());
         addRadioButton("Формула 1",1);
         addRadioButton("Формула 2",2);
-        radioButtons.setSelected(radioButtons.getElements().nextElement().getModel(), true);
+        radioButtonsForFunc.setSelected(radioButtonsForFunc.getElements().nextElement().getModel(), true);
         hboxFormulaType.add(Box.createHorizontalGlue());
         hboxFormulaType.setBorder(BorderFactory.createLineBorder(Color.YELLOW));
 
@@ -97,6 +132,7 @@ public class MainFrame extends JFrame {
         // Добавление области для вывода результатов
         JLabel labelForResult = new JLabel("Результат:");
         textFieldResult = new JTextField("0",10);
+        textFieldResult.setMaximumSize(textFieldResult.getPreferredSize());
         Box hboxResult = Box.createHorizontalBox();
         hboxResult.add(Box.createHorizontalGlue());
         hboxResult.add(labelForResult);
@@ -107,7 +143,6 @@ public class MainFrame extends JFrame {
 
         // создание конопок
         JButton buttonCalc = new JButton("Вычислить");
-        // Определить и зарегестрировать обработчик нажатия на кнопку
         buttonCalc.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ev) {
@@ -154,6 +189,7 @@ public class MainFrame extends JFrame {
         Box contentBox = Box.createVerticalBox();
         contentBox.add(Box.createVerticalGlue());
         //добавить горизонтальные контейнеры
+        contentBox.add(hboxImageType);
         contentBox.add(hboxFormulaType);
         contentBox.add(hboxVaribles);
         contentBox.add(hboxResult);
