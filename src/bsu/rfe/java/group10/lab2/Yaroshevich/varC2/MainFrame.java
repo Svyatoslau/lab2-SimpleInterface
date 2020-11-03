@@ -1,63 +1,95 @@
 package bsu.rfe.java.group10.lab2.Yaroshevich.varC2;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class MainFrame extends JFrame {
-    //размеры окна приложения в виде консоли
-    private static final int WIDTH = 400;
+    //размер окна
+    private static final int WIDTH = 420;
     private static final int HEIGHT = 320;
 
-    //текстовые поля для считывания X и Y
+    //текстовые поля
     private JTextField textFieldX;
     private JTextField textFieldY;
+    private JTextField textFieldZ;
+    private JTextField textFieldResult;
 
-    //текстовы поля для отображения результата
-    private  JTextField textFieldResult;
+    //Внутреняя память
+    private Double mem1 = (double) 0;
+    private Double mem2 = (double) 0;
+    private Double mem3 = (double) 0;
 
     //группа радио кнопок для отображения уникальности выделения в группе
-    private ButtonGroup radioButtons = new ButtonGroup();
-
-    //Контейнер для отображения радио-кнопок
+    private ButtonGroup radioButtonsForFunc = new ButtonGroup();
+    private ButtonGroup radioButtonsForMemory = new ButtonGroup();
+    //Контейнер для отображения радио-кнопок:
+    // формул
     private Box hboxFormulaType = Box.createHorizontalBox();
+    // памяти
+    private Box hboxMemoryType = Box.createHorizontalBox();
 
-    //индентификатор выбранной формулы
     private int formuaId = 1;
+    private int memoryId = 1;
+    private String pathToImageFunc ="C:\\study\\Java\\lab2 - Simple Interface\\images\\func1.jpg";
+    JLabel labelForFormula = new JLabel();
 
-    //методы-помощники для вычисления значений функций
     //Формула №1 для расчёта
-    public Double calculate1(Double x,Double y){
-        return x*x + y*y;
+    public Double calculate1(Double x,Double y,Double z){
+        return Math.pow((Math.log(Math.pow((1+x),2))+Math.cos(Math.PI*Math.pow(z,3))),Math.sin(y))+Math.pow(Math.pow(Math.E,Math.pow(x,2))+Math.cos(Math.pow(Math.E,z))+Math.pow(1/y,0.5),1/x);
     }
+
+    // Считывания картинки и вставка её в label
+    private void labelPicture(){
+        if(formuaId==2) pathToImageFunc="C:\\study\\Java\\lab2 - Simple Interface\\images\\func2.jpg";
+        else pathToImageFunc ="C:\\study\\Java\\lab2 - Simple Interface\\images\\func1.jpg";
+        BufferedImage imageFunc1 = null;
+        try {
+            imageFunc1 = ImageIO.read(new File(pathToImageFunc));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        labelForFormula.setIcon(new ImageIcon(imageFunc1));
+    }
+
     //Формлуа №2 для рассчёта
-    public Double calculate2(Double x,Double y){
-        return x*x*x + 1/y;
+    public Double calculate2(Double x,Double y,Double z){
+        return Math.pow(Math.cos(Math.PI*Math.pow(x,3))+Math.log(Math.pow((1+y),2)),0.25)*(Math.pow(Math.E,Math.pow(z,2))+Math.pow(1/x,0.5)+Math.cos(Math.pow(Math.E,y)));
     }
 
     //методы помощники для добавления радио кнопок
-    //buttonName - текст рядом с кнопкой, formulaId - идентификатор формулы
-    private void addRadioButton(String buttonName,final int formuaId){
-        //Создать экземпляр радио-кнопки с заданным текстом
+    private void addRadioButtonForFormula(String buttonName,final int formuaId){
         JRadioButton button = new JRadioButton(buttonName);
-        //Определить и зарегистрировать обработчик
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ev) {
-                // который будет устанавливать идентификатор выбранной
-                //формулы в классе MainFrame равным formulaId
                 MainFrame.this.formuaId = formuaId;
+                labelPicture();
             }
         });
-        //Добавить радио-кнопку в группу
-        radioButtons.add(button);
-        // Добавить радио-кнопку в группу
-        // Для этого ссылка на контейнер сделана полем данных класса
+        radioButtonsForFunc.add(button);
         hboxFormulaType.add(button);
     }
+    private void addRadioButtonForMemory(String buttonName,final int memoryId){
+        JRadioButton button = new JRadioButton(buttonName);
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ev) {
+                MainFrame.this.memoryId = memoryId;
+            }
+        });
+        radioButtonsForMemory.add(button);
+        hboxMemoryType.add(button);
+    }
 
-    public MainFrame() {
+
+
+    public MainFrame(){
         //Вызов контруктора JFrame (Создание окна с заголовком)
         super("Вычисления формулы");
 
@@ -66,63 +98,80 @@ public class MainFrame extends JFrame {
         Toolkit kit = Toolkit.getDefaultToolkit();
         setLocation((kit.getScreenSize().width - WIDTH)/2,(kit.getScreenSize().height - HEIGHT)/2);
 
-        //добавление радио-кнопок выбора формулы
-        //добавить "клей" C1-H1 с левой стороны
+        //добавление картинки в контейнер
+        Box hboxImageType = Box.createHorizontalBox();
+        hboxImageType.add(Box.createHorizontalGlue());
+        labelPicture();
+        hboxImageType.add(labelForFormula);
+        hboxImageType.add(Box.createHorizontalGlue());
+        hboxImageType.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+        //добавление памяти
+        hboxMemoryType.add(Box.createHorizontalGlue());
+        addRadioButtonForMemory("Переменная 1",1);
+        addRadioButtonForMemory("Переменная 2",2);
+        addRadioButtonForMemory("Переменная 3",3);
+        radioButtonsForMemory.setSelected(radioButtonsForMemory.getElements().nextElement().getModel(),true);
+        hboxMemoryType.add(Box.createHorizontalGlue());
+        hboxMemoryType.setBorder(BorderFactory.createLineBorder(Color.MAGENTA));
+
+        //коробка для ячеек памяти
+        JTextField textFieldMem1 = new JTextField("0",11);
+        textFieldMem1.setMaximumSize(textFieldMem1.getPreferredSize());
+        JTextField textFieldMem2 = new JTextField("0",11);
+        textFieldMem2.setMaximumSize(textFieldMem2.getPreferredSize());
+        JTextField textFieldMem3 = new JTextField("0",11);
+        textFieldMem3.setMaximumSize(textFieldMem3.getPreferredSize());
+        Box hboxMemoryR = Box.createHorizontalBox();
+        hboxMemoryR.add(Box.createHorizontalGlue());
+        hboxMemoryR.add(textFieldMem1);
+        hboxMemoryR.add(Box.createHorizontalStrut(10));
+        hboxMemoryR.add(textFieldMem2);
+        hboxMemoryR.add(Box.createHorizontalStrut(10));
+        hboxMemoryR.add(textFieldMem3);
+        hboxMemoryR.add(Box.createHorizontalGlue());
+
+        //добавление радио-кнопок выбора формулы и добавление их в контейнер
         hboxFormulaType.add(Box.createHorizontalGlue());
-        //создать радио-кнопку для формулы 1
-        addRadioButton("Формула 1",1);
-        //создать радио-кнопку для формулы 2
-        addRadioButton("Формула 2",2);
-        //устанавить выделенной 1-ую кнопку из группы
-        radioButtons.setSelected(radioButtons.getElements().nextElement().getModel(), true);
-        //добавить "клей" C1-H2 с правой стороны
+        addRadioButtonForFormula("Формула 1",1);
+        addRadioButtonForFormula("Формула 2",2);
+        radioButtonsForFunc.setSelected(radioButtonsForFunc.getElements().nextElement().getModel(), true);
         hboxFormulaType.add(Box.createHorizontalGlue());
-        //задать рамку для коробки с помощью класса BorderFactory
         hboxFormulaType.setBorder(BorderFactory.createLineBorder(Color.YELLOW));
 
         // Создание текстовых полей для переменных
-        //Создание подписи "X: " для переменной X
         JLabel labelForX = new JLabel("X:");
-        //Создание текстового поля для для ввода переменной X,
-        //(по умолчанию 0)
         textFieldX = new JTextField("0",10);
-        // Установка макс размера = желаемому для предотвращения масштабирования
         textFieldX.setMaximumSize(textFieldX.getPreferredSize());
-        // Тоже самое для переменной Y
         JLabel labelForY = new JLabel("Y:");
         textFieldY = new JTextField("0",10);
         textFieldY.setMaximumSize(textFieldY.getPreferredSize());
-        //Создаём контейнер "с горизонтальной укладкой"
+        JLabel labelForZ = new JLabel("Z:");
+        textFieldZ = new JTextField("0",10);
+        textFieldZ.setMaximumSize(textFieldZ.getPreferredSize());
+
         Box hboxVaribles = Box.createHorizontalBox();
-        //Зададим рамку для коробки с помощью класса BorderFactory
         hboxVaribles.setBorder(BorderFactory.createLineBorder(Color.RED));
 
         // Добавление в контейнер ряд обьектов:
-        // ДОбавление клея C2-H1 - для максимального удаление от левого края
         hboxVaribles.add(Box.createHorizontalGlue());
-        // Добавление подписи для X
         hboxVaribles.add(labelForX);
-        // Добавление "распорки" C2-H2 шириной 10 пикселов для отступа
-        // между подписью и самим полем X для ввода значений
         hboxVaribles.add(Box.createHorizontalStrut(10));
-        // Добавление самого текстового поля для X
         hboxVaribles.add(textFieldX);
-        // Добавление "распорки" C2-H3 шириной 100 пикселов для отступа
-        // между текстовым полем X и подиписи для Y
         hboxVaribles.add(Box.createHorizontalStrut(100));
-        // Тоже самое делаем для Y
         hboxVaribles.add(labelForY);
         hboxVaribles.add(Box.createHorizontalStrut(10));
         hboxVaribles.add(textFieldY);
-        //Добавление "клея" C2-H5 для максимального удаления от правого края
+        hboxVaribles.add(Box.createHorizontalStrut(100));
+        hboxVaribles.add(labelForZ);
+        hboxVaribles.add(Box.createHorizontalStrut(10));
+        hboxVaribles.add(textFieldZ);
         hboxVaribles.add(Box.createHorizontalGlue());
 
         // Добавление области для вывода результатов
-        // Создать подписи для вывода результатов
         JLabel labelForResult = new JLabel("Результат:");
-        // создание текстового поля для вывода результатов с начальным значением - 0
-        textFieldResult = new JTextField("0",10);
-        //Создание контейнера  "коробка с горизонтальной укладкой" и его укоплектовка
+        textFieldResult = new JTextField("0",11);
+        textFieldResult.setMaximumSize(textFieldResult.getPreferredSize());
         Box hboxResult = Box.createHorizontalBox();
         hboxResult.add(Box.createHorizontalGlue());
         hboxResult.add(labelForResult);
@@ -132,22 +181,19 @@ public class MainFrame extends JFrame {
         hboxResult.setBorder(BorderFactory.createLineBorder(Color.BLUE));
 
         // создание конопок
-        // создание кнопки "Вычислить"
         JButton buttonCalc = new JButton("Вычислить");
-        // Определить и зарегестрировать обработчик нажатия на кнопку
         buttonCalc.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ev) {
                 try{
-                    // Получить значение X
                     Double x = Double.parseDouble(textFieldX.getText());
-                    // Получить значение Y
                     Double y = Double.parseDouble(textFieldY.getText());
+                    Double z = Double.parseDouble(textFieldZ.getText());
                     Double result;
                     if(formuaId==1)
-                        result = calculate1(x,y);
+                        result = calculate1(x,y,z);
                     else
-                        result = calculate2(x,y);
+                        result = calculate2(x,y,z);
                     // Установить текст записи равным результату
                     textFieldResult.setText(result.toString());
                 }catch (NumberFormatException ex) {
@@ -160,29 +206,80 @@ public class MainFrame extends JFrame {
         });
         // Создание кнопки "Очистить поля"
         JButton buttonReset = new JButton("Очистить поля");
-        // Определить и зарегестрировать обработчик нажатия на кнопку
         buttonReset.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ev) {
                 textFieldX.setText("0");
                 textFieldY.setText("0");
+                textFieldZ.setText("0");
                 textFieldResult.setText("0");
             }
         });
+        // "MC" - очищает значение активной переменной
+        JButton buttonMC = new JButton("MC");
+        buttonMC.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(memoryId==1){
+                    mem1 = (double) 0;
+                    textFieldMem1.setText(mem1.toString());
+                }
+                else if(memoryId==2){
+                    mem2 = (double) 0;
+                    textFieldMem2.setText(mem2.toString());
+                }
+                else if(memoryId==3){
+                    mem3 = (double) 0;
+                    textFieldMem3.setText(mem3.toString());
+                }
+            }
+        });
+        //"M+" - прибавляет к текщему значению памяти полученный результат
+        JButton buttonM = new JButton("M+");
+        buttonM.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(memoryId==1) {
+                    mem1  =  (double)mem1 + Double.parseDouble(textFieldResult.getText());
+                    textFieldMem1.setText(mem1.toString());
+                    textFieldResult.setText(mem1.toString());
+                }
+                else if(memoryId==2) {
+                    mem2 =(double)mem2 + Double.parseDouble(textFieldResult.getText());
+                    textFieldMem2.setText(mem2.toString());
+                    textFieldResult.setText(mem2.toString());
+                }
+                else if(memoryId==3){
+                    mem3 =(double)mem3 + Double.parseDouble(textFieldResult.getText());
+                    textFieldMem3.setText(mem3.toString());
+                    textFieldResult.setText(mem3.toString());
+                }
+            }
+        });
+
+
         // Создать коробку с горизонтальной укладкой и добавить туда кнопки
         Box hboxButtons = Box.createHorizontalBox();
         hboxButtons.add(Box.createHorizontalGlue());
         hboxButtons.add(buttonCalc);
         hboxButtons.add(Box.createHorizontalStrut(30));
+        hboxButtons.add(buttonM);
+        hboxButtons.add(Box.createHorizontalStrut(30));
+        hboxButtons.add(buttonMC);
+        hboxButtons.add(Box.createHorizontalStrut(30));
         hboxButtons.add(buttonReset);
         hboxButtons.add(Box.createHorizontalGlue());
         hboxButtons.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+
 
         // Создать контейнер "коробка с вертикальной укладкой"
         Box contentBox = Box.createVerticalBox();
         contentBox.add(Box.createVerticalGlue());
         //добавить горизонтальные контейнеры
+        contentBox.add(hboxImageType);
         contentBox.add(hboxFormulaType);
+        contentBox.add(hboxMemoryType);
+        contentBox.add(hboxMemoryR);
         contentBox.add(hboxVaribles);
         contentBox.add(hboxResult);
         contentBox.add(hboxButtons);
