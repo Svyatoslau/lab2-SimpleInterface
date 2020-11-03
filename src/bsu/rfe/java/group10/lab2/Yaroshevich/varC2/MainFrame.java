@@ -28,12 +28,12 @@ public class MainFrame extends JFrame {
 
     //методы-помощники для вычисления значений функций
     //Формула №1 для расчёта
-    public Double calculate1(Double x,Double y){
-        return x*x + y*y;
+    public Double calculate1(Double x,Double y,Double z){
+        return Math.pow((2*Math.log(1+x)+Math.cos(Math.PI*Math.pow(z,3))),Math.sin(y))+Math.pow(Math.pow(Math.E,Math.pow(x,2))+Math.cos(Math.pow(Math.E,z))+Math.pow(1/y,1/2),1/x);
     }
     //Формлуа №2 для рассчёта
-    public Double calculate2(Double x,Double y){
-        return x*x*x + 1/y;
+    public Double calculate2(Double x,Double y,Double z){
+        return Math.pow(Math.cos(Math.PI*Math.pow(x,3))+2*Math.log(1+y),1/4)*(Math.pow(Math.E,Math.pow(z,2))+Math.pow(1/x,1/2)+Math.cos(Math.pow(Math.E,y)));
     }
 
     //методы помощники для добавления радио кнопок
