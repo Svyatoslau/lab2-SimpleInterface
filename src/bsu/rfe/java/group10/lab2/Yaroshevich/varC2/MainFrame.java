@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class MainFrame extends JFrame {
     //размер окна
-    private static final int WIDTH = 400;
+    private static final int WIDTH = 420;
     private static final int HEIGHT = 320;
 
     //текстовые поля
@@ -21,9 +21,9 @@ public class MainFrame extends JFrame {
     private JTextField textFieldResult;
 
     //Внутреняя память
-    private Double mem1;
-    private Double mem2;
-    private Double mem3;
+    private Double mem1 = (double) 0;
+    private Double mem2 = (double) 0;
+    private Double mem3 = (double) 0;
 
     //группа радио кнопок для отображения уникальности выделения в группе
     private ButtonGroup radioButtonsForFunc = new ButtonGroup();
@@ -115,6 +115,22 @@ public class MainFrame extends JFrame {
         hboxMemoryType.add(Box.createHorizontalGlue());
         hboxMemoryType.setBorder(BorderFactory.createLineBorder(Color.MAGENTA));
 
+        //коробка для ячеек памяти
+        JTextField textFieldMem1 = new JTextField("0",11);
+        textFieldMem1.setMaximumSize(textFieldMem1.getPreferredSize());
+        JTextField textFieldMem2 = new JTextField("0",11);
+        textFieldMem2.setMaximumSize(textFieldMem2.getPreferredSize());
+        JTextField textFieldMem3 = new JTextField("0",11);
+        textFieldMem3.setMaximumSize(textFieldMem3.getPreferredSize());
+        Box hboxMemoryR = Box.createHorizontalBox();
+        hboxMemoryR.add(Box.createHorizontalGlue());
+        hboxMemoryR.add(textFieldMem1);
+        hboxMemoryR.add(Box.createHorizontalStrut(10));
+        hboxMemoryR.add(textFieldMem2);
+        hboxMemoryR.add(Box.createHorizontalStrut(10));
+        hboxMemoryR.add(textFieldMem3);
+        hboxMemoryR.add(Box.createHorizontalGlue());
+
         //добавление радио-кнопок выбора формулы и добавление их в контейнер
         hboxFormulaType.add(Box.createHorizontalGlue());
         addRadioButtonForFormula("Формула 1",1);
@@ -154,7 +170,7 @@ public class MainFrame extends JFrame {
 
         // Добавление области для вывода результатов
         JLabel labelForResult = new JLabel("Результат:");
-        textFieldResult = new JTextField("0",10);
+        textFieldResult = new JTextField("0",11);
         textFieldResult.setMaximumSize(textFieldResult.getPreferredSize());
         Box hboxResult = Box.createHorizontalBox();
         hboxResult.add(Box.createHorizontalGlue());
@@ -199,14 +215,62 @@ public class MainFrame extends JFrame {
                 textFieldResult.setText("0");
             }
         });
+        // "MC" - очищает значение активной переменной
+        JButton buttonMC = new JButton("MC");
+        buttonMC.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(memoryId==1){
+                    mem1 = (double) 0;
+                    textFieldMem1.setText(mem1.toString());
+                }
+                else if(memoryId==2){
+                    mem2 = (double) 0;
+                    textFieldMem2.setText(mem2.toString());
+                }
+                else if(memoryId==3){
+                    mem3 = (double) 0;
+                    textFieldMem3.setText(mem3.toString());
+                }
+            }
+        });
+        //"M+" - прибавляет к текщему значению памяти полученный результат
+        JButton buttonM = new JButton("M+");
+        buttonM.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(memoryId==1) {
+                    mem1  =  (double)mem1 + Double.parseDouble(textFieldResult.getText());
+                    textFieldMem1.setText(mem1.toString());
+                    textFieldResult.setText(mem1.toString());
+                }
+                else if(memoryId==2) {
+                    mem2 =(double)mem2 + Double.parseDouble(textFieldResult.getText());
+                    textFieldMem2.setText(mem2.toString());
+                    textFieldResult.setText(mem2.toString());
+                }
+                else if(memoryId==3){
+                    mem3 =(double)mem3 + Double.parseDouble(textFieldResult.getText());
+                    textFieldMem3.setText(mem3.toString());
+                    textFieldResult.setText(mem3.toString());
+                }
+            }
+        });
+
+
         // Создать коробку с горизонтальной укладкой и добавить туда кнопки
         Box hboxButtons = Box.createHorizontalBox();
         hboxButtons.add(Box.createHorizontalGlue());
         hboxButtons.add(buttonCalc);
         hboxButtons.add(Box.createHorizontalStrut(30));
+        hboxButtons.add(buttonM);
+        hboxButtons.add(Box.createHorizontalStrut(30));
+        hboxButtons.add(buttonMC);
+        hboxButtons.add(Box.createHorizontalStrut(30));
         hboxButtons.add(buttonReset);
         hboxButtons.add(Box.createHorizontalGlue());
         hboxButtons.setBorder(BorderFactory.createLineBorder(Color.GREEN));
+
 
         // Создать контейнер "коробка с вертикальной укладкой"
         Box contentBox = Box.createVerticalBox();
@@ -215,6 +279,7 @@ public class MainFrame extends JFrame {
         contentBox.add(hboxImageType);
         contentBox.add(hboxFormulaType);
         contentBox.add(hboxMemoryType);
+        contentBox.add(hboxMemoryR);
         contentBox.add(hboxVaribles);
         contentBox.add(hboxResult);
         contentBox.add(hboxButtons);
